@@ -1,4 +1,4 @@
-#include <iostream>
+#include <cstdio>
 #include <vector>
 
 struct Op
@@ -26,12 +26,12 @@ public:
 	}
 };
 
-Program Parse(std::istream& in)
+Program Parse(FILE* in)
 {
 	Program program;
 
-	char c;
-	while(in.get(c))
+	int c;
+	while( (c = getc(in)) != EOF)
 	{
 		switch(c)
 		{
@@ -59,21 +59,21 @@ bool Validate(const Program& program)
 
 namespace Codegen {
 
-void EmitCode(std::ostream& out, const Program& program)
+void EmitCode(FILE* out, const Program& program)
 {
 	extern const char* header;
 	extern const char* footer;
-	void EmitOpcode(std::ostream& out, const Op& op);
+	void EmitOpcode(FILE* out, const Op& op);
 
-	out << header;
+	fprintf(out, header);
 
 	for(const Op& op: program)
 		EmitOpcode(out, op);
 
-	out << footer;
+	fprintf(out, footer);
 }
 
-void EmitOpcode(std::ostream& out, const Op& op)
+void EmitOpcode(FILE* out, const Op& op)
 {
 	extern const char* val;
 	extern const char* ptr;
@@ -83,11 +83,11 @@ void EmitOpcode(std::ostream& out, const Op& op)
 	switch(op.type)
 	{
 		case Op::Type::VAL:
-			out << val;
+			fprintf(out, val);
 			break;
 
 		case Op::Type::PTR:
-			out << ptr;
+			fprintf(out, ptr);
 			break;
 
 		case Op::Type::IN:
@@ -137,10 +137,10 @@ using Codegen::EmitCode;
 
 int main(/*int argc, char const *argv[]*/)
 {
-	Program program = Parse(std::cin);
+	Program program = Parse(stdin);
 
 	if(Validate(program))
-		EmitCode(std::cout, program);
+		EmitCode(stdout, program);
 
 	return 0;
 }
