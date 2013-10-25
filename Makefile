@@ -1,4 +1,4 @@
-# d702db5cc895739743564b2f0c9d36a0
+# 1d53675bf3349c0cc20c48f3f251c235
 CFLAGS=-O$(O) -std=c++11
 O=2
 LFLAGS=
@@ -6,11 +6,11 @@ OBJS=objs/main.o
 
 
 .PHONY: all
-all: objs a.out
+all: objs bfc
 
-./a.out: $(OBJS)
-	@ echo "    LINK ./a.out"
-	@ $(CXX) $(OBJS) -o "./a.out" $(LFLAGS)
+./bfc: $(OBJS)
+	@ echo "    LINK ./bfc"
+	@ $(CXX) $(OBJS) -o "./bfc" $(LFLAGS)
 
 objs/main.o: main.cpp
 	@ echo "    CXX  ./main.cpp"
@@ -22,7 +22,7 @@ objs:
 c: clean
 clean:
 	@ if [ -d "objs" ]; then rm -r "objs"; fi
-	@ rm -f "./a.out"
+	@ rm -f "./bfc"
 	@ echo "    CLEAN"
 .PHONY: f fresh
 f: fresh
@@ -31,7 +31,7 @@ fresh: clean
 .PHONY: r run
 r: run
 run: all
-	@ ././a.out
+	@ ././bfc
 
 .PHONY: d debug
 d: debug
