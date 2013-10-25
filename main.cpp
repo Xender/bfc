@@ -54,7 +54,7 @@ Program Parse(FILE* in)
 bool Validate(const Program& program)
 {
 	(void) program;
-	return false;
+	return true;
 }
 
 namespace Codegen {
