@@ -83,11 +83,11 @@ void EmitOpcode(FILE* out, const Op& op)
 	switch(op.type)
 	{
 		case Op::Type::VAL:
-			fprintf(out, val);
+			fprintf(out, val, op.repetitions);
 			break;
 
 		case Op::Type::PTR:
-			fprintf(out, ptr);
+			fprintf(out, ptr, op.repetitions);
 			break;
 
 		case Op::Type::IN:
@@ -104,8 +104,8 @@ const char* header = R"(
 
 int main()
 {
-	int mem[MEM_SIZE];
-	size_t idx;
+	int mem[MEM_SIZE] = {};
+	size_t idx = 0;
 
 )";
 

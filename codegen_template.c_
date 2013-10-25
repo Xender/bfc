@@ -4,8 +4,8 @@
 
 int main()
 {
-	int mem[MEM_SIZE];
-	size_t idx;
+	int mem[MEM_SIZE] = {};
+	size_t idx = 0;
 
 /// ptr
 	idx = (idx + $repetitions$) % MEM_SIZE;
