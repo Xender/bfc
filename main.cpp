@@ -57,46 +57,7 @@ bool Validate(const Program& program)
 	return true;
 }
 
-namespace Codegen {
-
-void EmitCode(FILE* out, const Program& program)
-{
-	extern const char* header;
-	extern const char* footer;
-	void EmitOpcode(FILE* out, const Op& op);
-
-	fprintf(out, header);
-
-	for(const Op& op: program)
-		EmitOpcode(out, op);
-
-	fprintf(out, footer);
-}
-
-void EmitOpcode(FILE* out, const Op& op)
-{
-	extern const char* val;
-	extern const char* ptr;
-	/*extern const char* in;
-	extern const char* out______________________;*/
-
-	switch(op.type)
-	{
-		case Op::Type::VAL:
-			fprintf(out, val, op.repetitions);
-			break;
-
-		case Op::Type::PTR:
-			fprintf(out, ptr, op.repetitions);
-			break;
-
-		case Op::Type::IN:
-			break;
-
-		case Op::Type::OUT:
-			break;
-	}
-}
+namespace Opcodes {
 
 const char* header = R"(
 #include <stdio.h>
@@ -122,18 +83,48 @@ const char* ptr = R"(
 	idx = (idx + %i) %% MEM_SIZE;
 )";
 
-/*const char* in = R"(
-
+const char* in = R"(
+	mem[idx] = getchar();
 )";
 
-const char* out______________________ = R"(
+const char* out = R"(
+	putchar(mem[idx]);
+)";
 
-)";*/
 
+} // namespace Opcodes
 
-} // namespace Codegen
+void EmitCode(FILE* out, const Program& program)
+{
+	void EmitOpcode(FILE* out, const Op& op);
 
-using Codegen::EmitCode;
+	fprintf(out, Opcodes::header);
+
+	for(const Op& op: program)
+		EmitOpcode(out, op);
+
+	fprintf(out, Opcodes::footer);
+}
+
+void EmitOpcode(FILE* out, const Op& op)
+{
+	switch(op.type)
+	{
+		case Op::Type::VAL:
+			fprintf(out, Opcodes::val, op.repetitions);
+			break;
+
+		case Op::Type::PTR:
+			fprintf(out, Opcodes::ptr, op.repetitions);
+			break;
+
+		case Op::Type::IN:
+			break;
+
+		case Op::Type::OUT:
+			break;
+	}
+}
 
 int main(/*int argc, char const *argv[]*/)
 {

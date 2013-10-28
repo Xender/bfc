@@ -13,6 +13,12 @@ int main()
 /// val
 	mem[idx] += $repetitions$;
 
+/// in
+	mem[idx] = getchar();
+
+/// out
+	putchar(mem[idx]);
+
 /// loop_beg
 	while(mem[idx])
 	{
