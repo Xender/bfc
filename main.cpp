@@ -3,12 +3,14 @@
 
 struct Op
 {
-	enum class Type
+	enum /*class*/ Type
 	{
 		VAL,
 		PTR,
 		IN,
 		OUT,
+		LOOP_BEG,
+		LOOP_END,
 	} type;
 
 	int repetitions;
@@ -35,14 +37,14 @@ Program Parse(FILE* in)
 	{
 		switch(c)
 		{
-			case '+': program.AppendOp(Op::Type::VAL,  1); break;
-			case '-': program.AppendOp(Op::Type::VAL, -1); break;
-			case '>': program.AppendOp(Op::Type::PTR,  1); break;
-			case '<': program.AppendOp(Op::Type::PTR, -1); break;
-			case '.': program.AppendOp(Op::Type::IN,   1); break;
-			case ',': program.AppendOp(Op::Type::OUT,  1); break;
-			case '[': /* TODO implement */ break;
-			case ']': /* TODO implement */ break;
+			case '+': program.AppendOp(Op::Type::VAL,      1); break;
+			case '-': program.AppendOp(Op::Type::VAL,     -1); break;
+			case '>': program.AppendOp(Op::Type::PTR,      1); break;
+			case '<': program.AppendOp(Op::Type::PTR,     -1); break;
+			case '.': program.AppendOp(Op::Type::OUT,      1); break;
+			case ',': program.AppendOp(Op::Type::IN,       1); break;
+			case '[': program.AppendOp(Op::Type::LOOP_BEG, 1); break;
+			case ']': program.AppendOp(Op::Type::LOOP_END, 1); break;
 
 			default:;
 		}
@@ -65,7 +67,7 @@ const char* header = R"(
 
 int main()
 {
-	int mem[MEM_SIZE] = {};
+	char mem[MEM_SIZE] = {};
 	size_t idx = 0;
 
 )";
@@ -75,22 +77,15 @@ const char* footer = R"(
 }
 )";
 
-const char* val = R"(
-	mem[idx] += %i;
-)";
-
-const char* ptr = R"(
-	idx = (idx + %i) %% MEM_SIZE;
-)";
-
-const char* in = R"(
-	mem[idx] = getchar();
-)";
-
-const char* out = R"(
-	putchar(mem[idx]);
-)";
-
+const char* op[] =
+{
+	/* VAL,      */ "\tmem[idx] += %i;\n",
+	/* PTR,      */ "\tidx = (idx + %i) %% MEM_SIZE;\n",
+	/* IN,       */ "\tmem[idx] = getchar();\n",
+	/* OUT,      */ "\tputchar(mem[idx]);\n",
+	/* LOOP_BEG, */ "\twhile(mem[idx]) {\n" ,
+	/* LOOP_END, */ "\t}\n" ,
+};
 
 } // namespace Opcodes
 
@@ -111,17 +106,16 @@ void EmitOpcode(FILE* out, const Op& op)
 	switch(op.type)
 	{
 		case Op::Type::VAL:
-			fprintf(out, Opcodes::val, op.repetitions);
-			break;
-
 		case Op::Type::PTR:
-			fprintf(out, Opcodes::ptr, op.repetitions);
+			fprintf(out, Opcodes::op[op.type], op.repetitions);
 			break;
 
 		case Op::Type::IN:
-			break;
-
 		case Op::Type::OUT:
+		case Op::Type::LOOP_BEG:
+		case Op::Type::LOOP_END:
+			for(int i = 0; i < op.repetitions; ++i)
+			fprintf(out, Opcodes::op[op.type]);
 			break;
 	}
 }
